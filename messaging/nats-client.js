@@ -38,8 +38,15 @@ class NatsClient {
     }
 
     async publish(subject, data) {
+        // If not connected, try to connect first
         if (!this.isConnected || !this.nc) {
-            throw new Error("NATS client not connected");
+            try {
+                console.log("⚠️  NATS not connected, attempting to connect...");
+                await this.connect();
+            } catch (connectErr) {
+                console.error("❌ Failed to connect to NATS:", connectErr.message);
+                throw new Error("NATS client not connected and connection attempt failed");
+            }
         }
 
         try {

@@ -34,14 +34,16 @@ app.use('/api/order', OrderRouter);
 module.exports.start = async () => {
   try {
     // Initialize NATS connection for event-driven architecture
-    try {
-      const natsClient = getNatsClient();
-      await natsClient.connect();
+    // Try to connect, but don't block server startup if it fails
+    // The publish method will attempt to reconnect when needed
+    const natsClient = getNatsClient();
+    natsClient.connect().then(() => {
       console.info('✅ NATS connection initialized');
-    } catch (natsErr) {
-      console.warn('⚠️  NATS connection failed (order service may not work):', natsErr.message);
+    }).catch((natsErr) => {
+      console.warn('⚠️  NATS connection failed on startup (will retry on first publish):', natsErr.message);
       console.warn('⚠️  Make sure NATS server is running: nats-server');
-    }
+      console.warn('⚠️  The server will continue, but order events will fail until NATS is available');
+    });
 
     server.listen(8929, () => {
       console.info(`server running at port: ${8929}`);
