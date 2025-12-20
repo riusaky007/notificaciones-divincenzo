@@ -28,7 +28,8 @@
     "node-fetch": "^2.6.11",
     "nodemailer": "^6.9.3",
     "shortid": "^2.2.16",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "nats": "^2.20.0"
   },
   "description": ""
 }
